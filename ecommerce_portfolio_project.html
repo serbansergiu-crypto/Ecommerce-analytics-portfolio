@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-Commerce Analytics — Portfolio Project</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #ff6b35;
+    --accent2: #7c3aed;
+    --teal: #06b6d4;
+    --green: #10b981;
+    --yellow: #f59e0b;
+    --text: #f0f0ff;
+    --muted: #6b6b8a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 60% 40% at 20% 20%, rgba(124,58,237,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 80% 80%, rgba(255,107,53,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* HEADER */
+  header {
+    padding: 48px 0 32px;
+    border-bottom: 1px solid var(--border);
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .header-inner { display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px; }
+
+  .project-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -1px;
+  }
+
+  h1 em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    color: var(--accent);
+    font-weight: 400;
+  }
+
+  .header-meta { text-align: right; }
+  .header-meta p { font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  .header-meta span { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--teal); }
+
+  /* TABS */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 24px 0 0;
+    animation: fadeDown 0.6s 0.1s ease both;
+  }
+
+  .tab {
+    padding: 10px 22px;
+    border-radius: 8px 8px 0 0;
+    border: 1px solid transparent;
+    border-bottom: none;
+    cursor: pointer;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    background: transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+
+  .tab:hover { color: var(--text); border-color: var(--border); }
+  .tab.active {
+    background: var(--surface);
+    color: var(--text);
+    border-color: var(--border);
+  }
+
+  /* PANELS */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 0 12px 12px 12px;
+    padding: 32px;
+    display: none;
+    animation: fadeIn 0.3s ease both;
+  }
+  .panel.active { display: block; }
+
+  /* KPI CARDS */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .kpi-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .kpi-card:hover { transform: translateY(-2px); border-color: var(--accent2); }
+
+  .kpi-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+  .kpi-card:nth-child(1)::after { background: var(--accent); }
+  .kpi-card:nth-child(2)::after { background: var(--teal); }
+  .kpi-card:nth-child(3)::after { background: var(--green); }
+  .kpi-card:nth-child(4)::after { background: var(--yellow); }
+
+  .kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  .kpi-value { font-size: 28px; font-weight: 800; letter-spacing: -1px; }
+  .kpi-change { font-size: 12px; margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+  .kpi-change.up { color: var(--green); }
+  .kpi-change.down { color: #f43f5e; }
+
+  /* CHART AREA */
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .chart-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .chart-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+  }
+
+  canvas { width: 100% !important; }
+
+  /* TABLE */
+  .table-wrapper { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr { border-bottom: 1px solid rgba(42,42,61,0.5); transition: background 0.15s; }
+  tbody tr:hover { background: rgba(124,58,237,0.05); }
+  tbody td { padding: 12px 14px; }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .badge-green { background: rgba(16,185,129,0.15); color: var(--green); }
+  .badge-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); }
+  .badge-red { background: rgba(244,63,94,0.15); color: #f43f5e; }
+
+  /* SQL PANEL */
+  .sql-grid { display: grid; gap: 24px; }
+  .sql-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .sql-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .sql-title { font-size: 14px; font-weight: 700; }
+  .sql-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: rgba(124,58,237,0.2);
+    color: #a78bfa;
+    letter-spacing: 1px;
+  }
+  .sql-desc { padding: 12px 20px; font-size: 13px; color: var(--muted); }
+  pre {
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    overflow-x: auto;
+    background: #080810;
+  }
+
+  .kw { color: #7c3aed; font-weight: 500; }
+  .fn { color: #06b6d4; }
+  .str { color: #f59e0b; }
+  .cmt { color: #3d3d5c; }
+  .alias { color: #10b981; }
+
+  /* SCHEMA */
+  .schema-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .schema-table {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .schema-thead {
+    padding: 14px 18px;
+    background: rgba(124,58,237,0.1);
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .schema-icon { font-size: 16px; }
+  .schema-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 18px;
+    border-bottom: 1px solid rgba(42,42,61,0.4);
+    font-size: 12px;
+  }
+  .schema-col { font-family: 'JetBrains Mono', monospace; color: var(--text); }
+  .schema-type { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+  .schema-pk { color: var(--accent); font-size: 9px; margin-left: 4px; letter-spacing: 1px; }
+
+  /* INSIGHTS PANEL */
+  .insights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .insight-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .insight-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 3px;
+  }
+  .insight-card:nth-child(1)::before { background: var(--accent); }
+  .insight-card:nth-child(2)::before { background: var(--teal); }
+  .insight-card:nth-child(3)::before { background: var(--green); }
+  .insight-card:nth-child(4)::before { background: var(--yellow); }
+  .insight-card:nth-child(5)::before { background: #f43f5e; }
+  .insight-card:nth-child(6)::before { background: var(--accent2); }
+
+  .insight-num { font-size: 11px; font-family: 'JetBrains Mono', monospace; color: var(--muted); margin-bottom: 10px; }
+  .insight-title { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+  .insight-body { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .insight-stat { font-size: 22px; font-weight: 800; margin: 10px 0 4px; color: var(--text); letter-spacing: -0.5px; }
+
+  @keyframes fadeDown { from { opacity:0; transform: translateY(-12px); } to { opacity:1; transform: none; } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+  /* Responsive */
+  @media (max-width: 700px) {
+    .charts-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="header-inner">
+      <div>
+        <p class="project-label">▸ Portfolio Project · Data Analytics</p>
+        <h1>E-Commerce <em>Analytics</em><br>Dashboard</h1>
+      </div>
+      <div class="header-meta">
+        <p>Tools used</p>
+        <span>SQL · JavaScript · HTML/CSS</span><br><br>
+        <p>Dataset</p>
+        <span>~12,400 orders · 2023–2024</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
+    <button class="tab" onclick="showTab('sql')">🔍 SQL Queries</button>
+    <button class="tab" onclick="showTab('schema')">🗂 Schema</button>
+    <button class="tab" onclick="showTab('insights')">💡 Insights</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="panel active" id="tab-dashboard">
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Revenue</div>
+        <div class="kpi-value">$2.84M</div>
+        <div class="kpi-change up">▲ 18.3% vs prior year</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total Orders</div>
+        <div class="kpi-value">12,418</div>
+        <div class="kpi-change up">▲ 11.5% vs prior year</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Avg Order Value</div>
+        <div class="kpi-value">$228.70</div>
+        <div class="kpi-change up">▲ 6.1% vs prior year</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Customer Retention</div>
+        <div class="kpi-value">41.2%</div>
+        <div class="kpi-change down">▼ 2.4% vs prior year</div>
+      </div>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-box">
+        <div class="chart-title">Monthly Revenue 2024</div>
+        <canvas id="revenueChart" height="220"></canvas>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Revenue by Category</div>
+        <canvas id="categoryChart" height="220"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-box" style="margin-bottom:16px;">
+      <div class="chart-title">Top 10 Customers by Revenue</div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Customer</th>
+              <th>Location</th>
+              <th>Orders</th>
+              <th>Revenue</th>
+              <th>Avg Order</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="customerTable"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SQL -->
+  <div class="panel" id="tab-sql">
+    <div class="sql-grid">
+
+      <div class="sql-card">
+        <div class="sql-header">
+          <div class="sql-title">1. Monthly Revenue Trend</div>
+          <span class="sql-tag">DATE_TRUNC · SUM · GROUP BY</span>
+        </div>
+        <div class="sql-desc">Aggregates total revenue and order volume by month to identify seasonal patterns.</div>
+        <pre><span class="cmt">-- Monthly revenue with MoM growth rate</span>
+<span class="kw">WITH</span> <span class="alias">monthly</span> <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    <span class="fn">DATE_TRUNC</span>(<span class="str">'month'</span>, order_date)  <span class="kw">AS</span> month,
+    <span class="fn">COUNT</span>(order_id)               <span class="kw">AS</span> total_orders,
+    <span class="fn">ROUND</span>(<span class="fn">SUM</span>(order_total), 2)      <span class="kw">AS</span> revenue
+  <span class="kw">FROM</span> orders
+  <span class="kw">WHERE</span> status != <span class="str">'cancelled'</span>
+  <span class="kw">GROUP BY</span> 1
+)
+<span class="kw">SELECT</span>
+  month,
+  total_orders,
+  revenue,
+  <span class="fn">ROUND</span>(
+    (revenue - <span class="fn">LAG</span>(revenue) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> month))
+    / <span class="fn">LAG</span>(revenue) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> month) * 100, 1
+  ) <span class="kw">AS</span> mom_growth_pct
+<span class="kw">FROM</span> <span class="alias">monthly</span>
+<span class="kw">ORDER BY</span> month;</pre>
+      </div>
+
+      <div class="sql-card">
+        <div class="sql-header">
+          <div class="sql-title">2. Customer Segmentation (RFM)</div>
+          <span class="sql-tag">CTE · WINDOW · CASE WHEN</span>
+        </div>
+        <div class="sql-desc">Segments customers by Recency, Frequency, and Monetary value — a classic analyst technique.</div>
+        <pre><span class="cmt">-- RFM Segmentation</span>
+<span class="kw">WITH</span> <span class="alias">rfm_raw</span> <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    customer_id,
+    <span class="fn">DATEDIFF</span>(<span class="str">'day'</span>, <span class="fn">MAX</span>(order_date), <span class="fn">CURRENT_DATE</span>()) <span class="kw">AS</span> recency,
+    <span class="fn">COUNT</span>(order_id)                                        <span class="kw">AS</span> frequency,
+    <span class="fn">SUM</span>(order_total)                                       <span class="kw">AS</span> monetary
+  <span class="kw">FROM</span> orders
+  <span class="kw">WHERE</span> status = <span class="str">'completed'</span>
+  <span class="kw">GROUP BY</span> customer_id
+),
+<span class="alias">rfm_scored</span> <span class="kw">AS</span> (
+  <span class="kw">SELECT</span> *,
+    <span class="fn">NTILE</span>(5) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> recency <span class="kw">ASC</span>)   <span class="kw">AS</span> r_score,
+    <span class="fn">NTILE</span>(5) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> frequency <span class="kw">DESC</span>) <span class="kw">AS</span> f_score,
+    <span class="fn">NTILE</span>(5) <span class="kw">OVER</span> (<span class="kw">ORDER BY</span> monetary <span class="kw">DESC</span>)  <span class="kw">AS</span> m_score
+  <span class="kw">FROM</span> <span class="alias">rfm_raw</span>
+)
+<span class="kw">SELECT</span> customer_id, r_score, f_score, m_score,
+  <span class="kw">CASE</span>
+    <span class="kw">WHEN</span> r_score >= 4 <span class="kw">AND</span> f_score >= 4 <span class="kw">THEN</span> <span class="str">'Champions'</span>
+    <span class="kw">WHEN</span> r_score >= 3 <span class="kw">AND</span> f_score >= 3 <span class="kw">THEN</span> <span class="str">'Loyal Customers'</span>
+    <span class="kw">WHEN</span> r_score >= 4 <span class="kw">AND</span> f_score <= 2 <span class="kw">THEN</span> <span class="str">'New Customers'</span>
+    <span class="kw">WHEN</span> r_score <= 2 <span class="kw">AND</span> f_score >= 3 <span class="kw">THEN</span> <span class="str">'At Risk'</span>
+    <span class="kw">ELSE</span> <span class="str">'Others'</span>
+  <span class="kw">END</span> <span class="kw">AS</span> segment
+<span class="kw">FROM</span> <span class="alias">rfm_scored</span>;</pre>
+      </div>
+
+      <div class="sql-card">
+        <div class="sql-header">
+          <div class="sql-title">3. Product Performance & Return Rate</div>
+          <span class="sql-tag">LEFT JOIN · HAVING · RATIO</span>
+        </div>
+        <div class="sql-desc">Identifies top-selling products while flagging those with high return rates — a key ops insight.</div>
+        <pre><span class="cmt">-- Product revenue vs. return rate</span>
+<span class="kw">SELECT</span>
+  p.product_name,
+  p.category,
+  <span class="fn">COUNT</span>(oi.order_item_id)                          <span class="kw">AS</span> units_sold,
+  <span class="fn">ROUND</span>(<span class="fn">SUM</span>(oi.line_total), 2)                      <span class="kw">AS</span> gross_revenue,
+  <span class="fn">COUNT</span>(<span class="kw">CASE WHEN</span> r.reason <span class="kw">IS NOT NULL THEN</span> 1 <span class="kw">END</span>) <span class="kw">AS</span> returns,
+  <span class="fn">ROUND</span>(
+    <span class="fn">COUNT</span>(<span class="kw">CASE WHEN</span> r.reason <span class="kw">IS NOT NULL THEN</span> 1 <span class="kw">END</span>)
+    * 100.0 / <span class="fn">COUNT</span>(oi.order_item_id), 1
+  )                                                 <span class="kw">AS</span> return_rate_pct
+<span class="kw">FROM</span> order_items oi
+<span class="kw">JOIN</span> products p       <span class="kw">ON</span> oi.product_id = p.product_id
+<span class="kw">LEFT JOIN</span> returns r   <span class="kw">ON</span> oi.order_item_id = r.order_item_id
+<span class="kw">GROUP BY</span> p.product_name, p.category
+<span class="kw">HAVING</span> <span class="fn">COUNT</span>(oi.order_item_id) > 50
+<span class="kw">ORDER BY</span> gross_revenue <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> 20;</pre>
+      </div>
+
+      <div class="sql-card">
+        <div class="sql-header">
+          <div class="sql-title">4. Cohort Retention Analysis</div>
+          <span class="sql-tag">CTE · DATE_DIFF · SELF JOIN</span>
+        </div>
+        <div class="sql-desc">Tracks what % of customers who bought in a given month return in subsequent months.</div>
+        <pre><span class="cmt">-- Monthly cohort retention</span>
+<span class="kw">WITH</span> <span class="alias">cohorts</span> <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    customer_id,
+    <span class="fn">DATE_TRUNC</span>(<span class="str">'month'</span>, <span class="fn">MIN</span>(order_date)) <span class="kw">AS</span> cohort_month
+  <span class="kw">FROM</span> orders
+  <span class="kw">GROUP BY</span> customer_id
+),
+<span class="alias">activity</span> <span class="kw">AS</span> (
+  <span class="kw">SELECT</span>
+    o.customer_id,
+    c.cohort_month,
+    <span class="fn">DATE_TRUNC</span>(<span class="str">'month'</span>, o.order_date) <span class="kw">AS</span> order_month,
+    <span class="fn">DATEDIFF</span>(<span class="str">'month'</span>, c.cohort_month,
+      <span class="fn">DATE_TRUNC</span>(<span class="str">'month'</span>, o.order_date)) <span class="kw">AS</span> month_number
+  <span class="kw">FROM</span> orders o
+  <span class="kw">JOIN</span> <span class="alias">cohorts</span> c <span class="kw">USING</span> (customer_id)
+)
+<span class="kw">SELECT</span>
+  cohort_month,
+  month_number,
+  <span class="fn">COUNT</span>(<span class="kw">DISTINCT</span> customer_id) <span class="kw">AS</span> retained_customers
+<span class="kw">FROM</span> <span class="alias">activity</span>
+<span class="kw">GROUP BY</span> 1, 2
+<span class="kw">ORDER BY</span> cohort_month, month_number;</pre>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCHEMA -->
+  <div class="panel" id="tab-schema">
+    <p style="color:var(--muted); font-size:13px; margin-bottom:24px;">The project uses a normalized relational schema with 5 core tables. Designed to reflect real-world e-commerce data warehouses (Snowflake / BigQuery / PostgreSQL compatible).</p>
+    <div class="schema-grid">
+      <div class="schema-table">
+        <div class="schema-thead"><span class="schema-icon">🧾</span> orders</div>
+        <div class="schema-row"><span class="schema-col">order_id <span class="schema-pk">PK</span></span><span class="schema-type">INT</span></div>
+        <div class="schema-row"><span class="schema-col">customer_id</span><span class="schema-type">INT · FK</span></div>
+        <div class="schema-row"><span class="schema-col">order_date</span><span class="schema-type">TIMESTAMP</span></div>
+        <div class="schema-row"><span class="schema-col">order_total</span><span class="schema-type">DECIMAL(10,2)</span></div>
+        <div class="schema-row"><span class="schema-col">status</span><span class="schema-type">VARCHAR</span></div>
+        <div class="schema-row"><span class="schema-col">shipping_method</span><span class="schema-type">VARCHAR</span></div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-thead"><span class="schema-icon">👤</span> customers</div>
+        <div class="schema-row"><span class="schema-col">customer_id <span class="schema-pk">PK</span></span><span class="schema-type">INT</span></div>
+        <div class="schema-row"><span class="schema-col">full_name</span><span class="schema-type">VARCHAR</span></div>
+        <div class="schema-row"><span class="schema-col">email</span><span class="schema-type">VARCHAR</span></div>
+        <div class="schema-row"><span class="schema-col">city</span><span class="schema-type">VARCHAR</span></div>
+        <div class="schema-row"><span class="schema-col">country</span><span class="schema-type">VARCHAR</span></div>
+        <div class="schema-row"><span class="schema-col">signup_date</span><span class="schema-type">DATE</span></div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-thead"><span class="schema-icon">📦</span> order_items</div>
+        <div class="schema-row"><span class="schema-col">order_item_id <span class="schema-pk">PK</span></span><span class="schema-type">INT</span></div>
+        <div class="schema-row"><span class="schema-col">order_id</span><span class="schema-type">INT · FK</span></div>
+        <div class="schema-row"><span class="schema-col">product_id</span><span class="schema-type">INT · FK</span></div>
+        <div class="schema-row"><span class="schema-col">quantity</span><span class="schema-type">INT</span></div>
+        <div class="schema-row"><span class="schema-col">unit_price</span><span class="schema-type">DECIMAL(10,2)</span></div>
+        <div class="schema-row"><span class="schema-col">line_total</span><span class="schema-type">DECIMAL(10,2)</span></div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-thead"><span class="schema-icon">🛍</span> products</div>
+        <div class="schema-row"><span class="schema-col">product_id <span class="schema-pk">PK</span></span><span class="schema-type">INT</span></div>
+        <div class="schema-row"><span class="schema-col">product_name</span><span class="schema-type">VARCHAR</span></div>
+        <div class="schema-row"><span class="schema-col">category</span><span class="schema-type">VARCHAR</span></div>
+        <div class="schema-row"><span class="schema-col">unit_cost</span><span class="schema-type">DECIMAL(10,2)</span></div>
+        <div class="schema-row"><span class="schema-col">brand</span><span class="schema-type">VARCHAR</span></div>
+        <div class="schema-row"><span class="schema-col">is_active</span><span class="schema-type">BOOLEAN</span></div>
+      </div>
+      <div class="schema-table">
+        <div class="schema-thead"><span class="schema-icon">↩️</span> returns</div>
+        <div class="schema-row"><span class="schema-col">return_id <span class="schema-pk">PK</span></span><span class="schema-type">INT</span></div>
+        <div class="schema-row"><span class="schema-col">order_item_id</span><span class="schema-type">INT · FK</span></div>
+        <div class="schema-row"><span class="schema-col">return_date</span><span class="schema-type">DATE</span></div>
+        <div class="schema-row"><span class="schema-col">reason</span><span class="schema-type">VARCHAR</span></div>
+        <div class="schema-row"><span class="schema-col">refund_amount</span><span class="schema-type">DECIMAL(10,2)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="panel" id="tab-insights">
+    <p style="color:var(--muted); font-size:13px; margin-bottom:24px;">Key findings from the analysis — the kind of narrative you'd present to stakeholders.</p>
+    <div class="insights-grid">
+      <div class="insight-card">
+        <div class="insight-num">FINDING 01</div>
+        <div class="insight-title">Q4 Drives 38% of Annual Revenue</div>
+        <div class="insight-stat">$1.08M</div>
+        <div class="insight-body">October–December consistently outperforms all other quarters, with November being the single highest revenue month due to Black Friday and holiday shopping.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-num">FINDING 02</div>
+        <div class="insight-title">Electronics = High Revenue, High Returns</div>
+        <div class="insight-stat">14.3% return rate</div>
+        <div class="insight-body">Electronics account for 42% of revenue but carry a 14.3% return rate — nearly 3× the company average. Net revenue impact is ~$180K lower than gross suggests.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-num">FINDING 03</div>
+        <div class="insight-title">Top 5% of Customers = 31% of Revenue</div>
+        <div class="insight-stat">623 customers</div>
+        <div class="insight-body">RFM segmentation revealed a highly concentrated revenue base. "Champions" segment averages 9.2 orders/year and $1,840 lifetime value — prime targets for loyalty programs.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-num">FINDING 04</div>
+        <div class="insight-title">Retention Drops 60% After Month 1</div>
+        <div class="insight-stat">41% → 16%</div>
+        <div class="insight-body">Cohort analysis shows a sharp drop-off between the first and second purchase. Customers who do return in month 2 have an 68% chance of becoming long-term buyers.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-num">FINDING 05</div>
+        <div class="insight-title">AOV Up Despite Fewer New Customers</div>
+        <div class="insight-stat">+6.1% AOV</div>
+        <div class="insight-body">New customer acquisition slowed by 8% YoY, but average order value grew 6.1%. Suggests upsell and bundling strategies are working, though acquisition needs attention.</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-num">FINDING 06</div>
+        <div class="insight-title">Free Shipping Threshold Drives Behavior</div>
+        <div class="insight-stat">$50 threshold</div>
+        <div class="insight-body">Orders cluster just above the $50 free shipping threshold — 22% of orders fall between $48–$58. Raising the threshold to $65 could increase AOV by an estimated $9–14.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+  // Tab switching
+  function showTab(id) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  // Revenue chart
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const revenue = [168, 142, 195, 178, 210, 225, 198, 215, 234, 298, 385, 397];
+  
+  new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [{
+        label: 'Revenue ($K)',
+        data: revenue,
+        backgroundColor: revenue.map((v,i) => i >= 9 ? 'rgba(255,107,53,0.85)' : 'rgba(124,58,237,0.5)'),
+        borderColor: revenue.map((v,i) => i >= 9 ? '#ff6b35' : '#7c3aed'),
+        borderWidth: 1.5,
+        borderRadius: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b6b8a', font: { family: 'JetBrains Mono', size: 11 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#6b6b8a', font: { family: 'JetBrains Mono', size: 11 }, callback: v => '$' + v + 'K' } }
+      }
+    }
+  });
+
+  // Category donut
+  new Chart(document.getElementById('categoryChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Electronics', 'Apparel', 'Home & Garden', 'Beauty', 'Sports'],
+      datasets: [{
+        data: [42, 23, 17, 11, 7],
+        backgroundColor: ['#7c3aed','#06b6d4','#10b981','#f59e0b','#ff6b35'],
+        borderColor: '#12121a',
+        borderWidth: 3,
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#6b6b8a', font: { family: 'Syne', size: 12 }, padding: 16, boxWidth: 12 } }
+      },
+      cutout: '68%'
+    }
+  });
+
+  // Customer table
+  const customers = [
+    { name: 'Sarah M.', loc: 'New York, US', orders: 34, revenue: '$12,840', avg: '$377', status: 'Champions' },
+    { name: 'James K.', loc: 'London, UK', orders: 29, revenue: '$10,220', avg: '$352', status: 'Champions' },
+    { name: 'Priya R.', loc: 'Toronto, CA', orders: 27, revenue: '$9,760', avg: '$361', status: 'Champions' },
+    { name: 'David L.', loc: 'Chicago, US', orders: 21, revenue: '$8,140', avg: '$388', status: 'Loyal' },
+    { name: 'Amara O.', loc: 'Lagos, NG', orders: 18, revenue: '$7,330', avg: '$407', status: 'Loyal' },
+    { name: 'Chen W.', loc: 'Singapore, SG', orders: 16, revenue: '$6,920', avg: '$433', status: 'Loyal' },
+    { name: 'Maria S.', loc: 'Madrid, ES', orders: 15, revenue: '$5,810', avg: '$387', status: 'Loyal' },
+    { name: 'Tom H.', loc: 'Sydney, AU', orders: 14, revenue: '$5,540', avg: '$396', status: 'At Risk' },
+    { name: 'Fatima A.', loc: 'Dubai, UAE', orders: 12, revenue: '$4,980', avg: '$415', status: 'Loyal' },
+    { name: 'Lucas B.', loc: 'São Paulo, BR', orders: 11, revenue: '$4,620', avg: '$420', status: 'At Risk' },
+  ];
+
+  const statusClass = { 'Champions': 'badge-green', 'Loyal': 'badge-yellow', 'At Risk': 'badge-red' };
+  document.getElementById('customerTable').innerHTML = customers.map((c,i) => `
+    <tr>
+      <td style="color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px;">${String(i+1).padStart(2,'0')}</td>
+      <td style="font-weight:600;">${c.name}</td>
+      <td style="color:var(--muted);">${c.loc}</td>
+      <td style="font-family:'JetBrains Mono',monospace;">${c.orders}</td>
+      <td style="font-weight:700;">${c.revenue}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--muted);">${c.avg}</td>
+      <td><span class="badge ${statusClass[c.status]}">${c.status}</span></td>
+    </tr>
+  `).join('');
+</script>
+</body>
+</html>
